@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MarkdownVaultToDocx": {
+      "commandName": "Project",
+      "commandLineArgs": "C:\\Users\\xboxl\\Desktop\\vault C:\\Users\\xboxl\\Desktop\\Output"
+    }
+  }
+}

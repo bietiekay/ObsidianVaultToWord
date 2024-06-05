@@ -87,6 +87,8 @@ public class RecursiveFileProcessor
             {
                 // remove...
                 String InputFileRawContents = File.ReadAllText(inputpath + Path.DirectorySeparatorChar + filename);
+                DateTime CreationDateTime = File.GetCreationTime(inputpath+ Path.DirectorySeparatorChar + filename);
+                DateTime ModifiedDateTime = File.GetLastWriteTime(filename+ Path.DirectorySeparatorChar + filename);
                 String FullOutputPath = outputpath+inputpath.Remove(0,originalinputpath.Length);
                 String HashFileName = FullOutputPath + filename.Replace(".md",".hash");
                 String FullOutputPathFilenameDocx = FullOutputPath + filename.Replace(".md", ".docx");
@@ -110,13 +112,13 @@ public class RecursiveFileProcessor
                     } else
                     {
                         Console.WriteLine("Updating: "+ FullOutputPathFilenameDocx);
-                        WriteFile(InputFileRawContents, HashFileName, FullOutputPathFilenameDocx);
+                        WriteFile(InputFileRawContents, HashFileName, FullOutputPathFilenameDocx, CreationDateTime, ModifiedDateTime);
                     }
                 }
                 else // we have not seen this file yet
                 {
                     Console.WriteLine("Processing: " + inputpath + filename + " ===> " + FullOutputPathFilenameDocx);
-                    WriteFile(InputFileRawContents, HashFileName, FullOutputPathFilenameDocx);
+                    WriteFile(InputFileRawContents, HashFileName, FullOutputPathFilenameDocx, CreationDateTime, ModifiedDateTime);
                 }
             }
         }
@@ -127,12 +129,14 @@ public class RecursiveFileProcessor
         //Console.ReadLine();
     }
 
-    public static void WriteFile(string InputFileRawContents, string HashFileName, string FullOutputPathFilenameDocx)
+    public static void WriteFile(string InputFileRawContents, string HashFileName, string FullOutputPathFilenameDocx, DateTime CreationTime, DateTime ModifiedDateTime)
     {
         String MarkdownRemovedContents = Markdown.ToPlainText(InputFileRawContents);
         File.WriteAllText(HashFileName, GetStringSha256Hash((string)InputFileRawContents));
         var doc = DocX.Create(FullOutputPathFilenameDocx);
         var p = doc.InsertParagraph((string)MarkdownRemovedContents);
         doc.Save();
+        File.SetCreationTime(FullOutputPathFilenameDocx, CreationTime);
+        File.SetLastWriteTime(FullOutputPathFilenameDocx, ModifiedDateTime);
     }
 }

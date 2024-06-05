@@ -96,6 +96,7 @@ public class RecursiveFileProcessor
                 {
                     Directory.CreateDirectory(FullOutputPath);
                 }
+
                 // check if file exists and has changed...
                 if (File.Exists(HashFileName))
                 {
@@ -104,28 +105,18 @@ public class RecursiveFileProcessor
                     string TargetFileHash = (string)File.ReadAllText(HashFileName);
                     if (SourceFileHash.Equals(TargetFileHash))
                     {
-                        Console.WriteLine("Did not change: " + HashFileName);
+                        //Console.WriteLine("Did not change: " + HashFileName);
                         return;
                     } else
                     {
-                        Console.WriteLine("Updating: " + inputpath + filename + " ===> " + FullOutputPathFilenameDocx);
-                       
-                        String MarkdownRemovedContents = Markdown.ToPlainText(InputFileRawContents);
-                        File.WriteAllText(HashFileName, GetStringSha256Hash((string)InputFileRawContents));
-                        var doc = DocX.Create(FullOutputPathFilenameDocx);
-                        var p = doc.InsertParagraph((string)MarkdownRemovedContents);
-                        doc.Save();
+                        Console.WriteLine("Updating: "+ FullOutputPathFilenameDocx);
+                        WriteFile(InputFileRawContents, HashFileName, FullOutputPathFilenameDocx);
                     }
                 }
-                else
+                else // we have not seen this file yet
                 {
                     Console.WriteLine("Processing: " + inputpath + filename + " ===> " + FullOutputPathFilenameDocx);
-                    String MarkdownRemovedContents = Markdown.ToPlainText(InputFileRawContents);
-                    File.WriteAllText(HashFileName, GetStringSha256Hash((string)InputFileRawContents));
-                    var doc = DocX.Create(FullOutputPathFilenameDocx);
-                    var p = doc.InsertParagraph((string)MarkdownRemovedContents);
-                    doc.Save();
-
+                    WriteFile(InputFileRawContents, HashFileName, FullOutputPathFilenameDocx);
                 }
             }
         }
@@ -134,5 +125,14 @@ public class RecursiveFileProcessor
             Console.WriteLine(ex.ToString()); 
         }
         //Console.ReadLine();
+    }
+
+    public static void WriteFile(string InputFileRawContents, string HashFileName, string FullOutputPathFilenameDocx)
+    {
+        String MarkdownRemovedContents = Markdown.ToPlainText(InputFileRawContents);
+        File.WriteAllText(HashFileName, GetStringSha256Hash((string)InputFileRawContents));
+        var doc = DocX.Create(FullOutputPathFilenameDocx);
+        var p = doc.InsertParagraph((string)MarkdownRemovedContents);
+        doc.Save();
     }
 }

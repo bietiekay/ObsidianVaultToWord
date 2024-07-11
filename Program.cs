@@ -131,7 +131,7 @@ public class RecursiveFileProcessor
 
     public static void WriteFile(string InputFileRawContents, string HashFileName, string FullOutputPathFilenameDocx, DateTime CreationTime, DateTime ModifiedDateTime)
     {
-        String MarkdownRemovedContents = Markdown.ToPlainText(InputFileRawContents);
+        String MarkdownRemovedContents = Markdown.ToPlainText(InputFileRawContents).Replace("[[", "").Replace("]]", "");
         File.WriteAllText(HashFileName, GetStringSha256Hash((string)InputFileRawContents));
         var doc = DocX.Create(FullOutputPathFilenameDocx);
         var p = doc.InsertParagraph((string)MarkdownRemovedContents);
